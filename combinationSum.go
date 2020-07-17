@@ -5,33 +5,24 @@ import (
 	"sort"
 )
 
+var res [][]int
 func combinationSum(candidates []int, target int) [][]int {
-	ch := make(chan []int, 1)
-	var res [][]int
+	res = *new([][]int)
 	sort.Ints(candidates)
-	go func() {
-		backtrack(target, candidates, ch, []int{}, 0)
-		close(ch)
-	}()
+	backtrack(target, candidates, []int{}, 0)
 
-	for {
-		v, ok := <-ch
-		if !ok {
-			break
-		}
-		res = append(res, v)
-	}
 	return res
 }
 
-func backtrack(remain int, candidates []int, ch chan []int, tmp []int, st int) {
+func backtrack(remain int, candidates []int, tmp []int, st int) {
 	if remain < 0 {
 		return
 	}
 
 	if remain == 0 {
-		fmt.Println(remain, tmp)
-		ch <- tmp
+		t := make([]int, len(tmp))
+		copy(t, tmp)
+		res = append(res, t)
 		return
 	}
 
@@ -39,7 +30,7 @@ func backtrack(remain int, candidates []int, ch chan []int, tmp []int, st int) {
 		for i := st; i < len(candidates); i++ {
 			t := tmp
 			tmp = append(tmp, candidates[i])
-			backtrack(remain-candidates[i], candidates, ch, tmp, i)
+			backtrack(remain-candidates[i], candidates, tmp, i)
 			tmp = t
 		}
 	}
